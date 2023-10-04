@@ -2,6 +2,8 @@ from enum import Enum
 from random import randrange, choice
 from ctypes import c_uint32
 
+import numpy as np
+
 
 class IALU:
     """
@@ -24,12 +26,14 @@ class IALU:
         Operation codes.
 
         Delays:
+        * `NONE`: 1 tick
         * `ADD`: 1 tick
         * `SUB`: 1 tick
         * `MUL`: fast_mul ? 1 tick : 32 ticks
         * `DIV`: 32 ticks
         """
 
+        NONE = 0
         ADD = 4
         SUB = 5
         MUL = 15
@@ -80,6 +84,10 @@ class IALU:
             result = 0
         else:
             match self._cmd:
+                case IALU.Cmd.NONE:
+                    assert self._rvm_cmd_vd == 0
+                    result = self._res
+
                 case IALU.Cmd.ADD:
                     assert self._rvm_cmd_vd == 0
                     result = self._op1 + self._op2
@@ -92,8 +100,7 @@ class IALU:
                     if not self._RVM_EXT:
                         raise
 
-                    if self._FAST_MUL:
-                        assert self._rvm_cmd_vd == 0
+                    if (self._cmd == IALU.Cmd.MUL) and self._FAST_MUL:
                         result = self._op1 * self._op2
                     elif self._rvm_cmd_vd:
                         if self._rvm_delay_counter == 0:
@@ -107,10 +114,24 @@ class IALU:
                         assert self._rvm_op2 == self._op2
                         assert self._rvm_cmd == self._cmd
 
-                        if (self._cmd == IALU.Cmd.DIV) and (self._op2 == 0):
-                            self._rvm_delay_counter = 31
+                        is_division_by_zero = (self._cmd == IALU.Cmd.DIV) and (
+                            self._op2 == 0
+                        )
 
-                        if self._rvm_delay_counter < (self.RVM_DELAY - 1):
+                        is_ops_equal = self._op1 == self._op2
+
+                        if (
+                            (
+                                self._rvm_delay_counter
+                                < (
+                                    self.RVM_DELAY - 2
+                                    if is_ops_equal
+                                    else self.RVM_DELAY - 1
+                                )
+                            )
+                            and not ((self._op1 == 0) or (self._op2 == 0))
+                            and not is_division_by_zero
+                        ):
                             self._rvm_delay_counter += 1
                             self._rvm_res_rdy = 0
                             result = self._res
@@ -124,7 +145,10 @@ class IALU:
                                     if self._op2 == 0:
                                         result = 2**self.XLEN - 1
                                     else:
-                                        result = self._op1 // self._op2
+                                        result = np.int32(
+                                            np.array(self._op1).astype(np.int32)
+                                            / np.array(self._op2).astype(np.int32)
+                                        ).item()
                     else:
                         result = self._res
 
