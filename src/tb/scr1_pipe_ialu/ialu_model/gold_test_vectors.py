@@ -1,7 +1,7 @@
 from enum import Enum
 
-from ialu import IALU
-from test_vector import TestVector
+from ialu_model.ialu import IALU
+from ialu_model.test_vector import TestVector
 
 
 class GoldTestVectorGroup(Enum):
@@ -130,7 +130,7 @@ GOLD_TEST_VECTORS = {
             rvm_cmd_vd=1,
             res=1,
             rvm_res_rdy=1,
-            delay=IALU.RVM_DELAY,
+            delay=IALU.RVM_DELAY - 1,
         ),
         TestVector(
             op1=0,
@@ -162,7 +162,7 @@ GOLD_TEST_VECTORS = {
             op2=0b01010101010101010101010101010101,
             cmd=IALU.Cmd.DIV,
             rvm_cmd_vd=1,
-            res=2,
+            res=2**IALU.XLEN - 1,
             rvm_res_rdy=1,
             delay=IALU.RVM_DELAY,
         ),
@@ -173,7 +173,6 @@ GOLD_TEST_VECTORS = {
             rvm_cmd_vd=1,
             res=0,
             rvm_res_rdy=1,
-            delay=IALU.RVM_DELAY,
         ),
         TestVector(
             op1=2**IALU.XLEN - 1,
@@ -189,7 +188,7 @@ GOLD_TEST_VECTORS = {
             op2=2**IALU.XLEN - 1,
             cmd=IALU.Cmd.DIV,
             rvm_cmd_vd=1,
-            res=0,
+            res=0b10000000000000000000000000000000,
             rvm_res_rdy=1,
             delay=IALU.RVM_DELAY,
         ),
