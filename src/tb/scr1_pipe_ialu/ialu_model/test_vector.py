@@ -1,4 +1,4 @@
-from ialu import IALU
+from ialu_model.ialu import IALU
 
 
 class TestVector:
