@@ -1,2 +1,8 @@
 build/**
 sim/tests/benchmarks/coremark/src/**
+
+# Created by Python
+__pycache__/
+
+# Created by cocotb
+sim_build/
