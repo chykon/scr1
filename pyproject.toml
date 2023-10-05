@@ -1,0 +1,27 @@
+[project]
+name = "scr1-verify"
+version = "0.1.0"
+
+dependencies = ["cocotb ~= 1.8.0", "numpy ~= 1.26.0"]
+
+
+[tool.pyright]
+typeCheckingMode = "strict"
+
+deprecateTypingAliases = true
+
+# Reason for disabling: `cocotb` does not provide stub files.
+reportMissingTypeStubs = "none"
+
+# Reason for disabling: `cocotb` does not define all types.
+reportUnknownMemberType = "none"
+
+reportCallInDefaultInitializer = "information"
+reportImplicitOverride = "information"
+reportImplicitStringConcatenation = "information"
+reportImportCycles = "information"
+reportMissingSuperCall = "information"
+reportPropertyTypeMismatch = "information"
+reportShadowedImports = "information"
+reportUninitializedInstanceVariable = "information"
+reportUnnecessaryTypeIgnoreComment = "information"
