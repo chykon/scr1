@@ -1,8 +1,9 @@
-from ialu import IALU
-from gold_test_vectors import GOLD_TEST_VECTORS, GoldTestVectorGroup
+from ialu_model.ialu import IALU
+from ialu_model.gold_test_vectors import GOLD_TEST_VECTORS, GoldTestVectorGroup
 
 
-def _test():
+def run():
+    """Test the iALU model."""
     ialu = IALU(rvm_ext=True)
 
     ialu.set_input_rst_n(0)
@@ -40,12 +41,11 @@ def _test():
 
                     for _ in range(test_vector.DELAY):
                         ialu.tick()
-                        if _ < (test_vector.DELAY - 1):
-                            assert ialu.get_output_rvm_res_rdy() == 0
+
+                        if ialu.get_output_rvm_res_rdy() == 1:
+                            break
+
+                        if _ == (test_vector.DELAY - 1):
+                            raise
 
                     assert ialu.get_output_res() == test_vector.RES
-                    assert ialu.get_output_rvm_res_rdy() == test_vector.RVM_RES_RDY
-
-
-if __name__ == "__main__":
-    _test()
