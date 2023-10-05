@@ -26,6 +26,7 @@ def run(check_model: bool = True):
             "-Wno-UNUSEDPARAM",
             "--assert",
             "--trace",
+            "--coverage",
         ],
     )
 
